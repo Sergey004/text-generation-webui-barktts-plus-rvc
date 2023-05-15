@@ -137,6 +137,10 @@ def generate_long_audio(ttstext: str) -> np.ndarray:
 
 
 def input_modifier(string):
+
+    # Remove autoplay from last reply
+    if shared.is_chat() and len(shared.history['internal']) > 0:
+        shared.history['visible'][-1][1] = shared.history['visible'][-1][1].replace('controls autoplay>', 'controls>')
     return string
 
 
