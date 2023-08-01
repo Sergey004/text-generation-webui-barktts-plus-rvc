@@ -1,0 +1,4 @@
+__pycache__/*
+generated_temp/*
+generated/*
+models/*

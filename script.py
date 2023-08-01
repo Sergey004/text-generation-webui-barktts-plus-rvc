@@ -44,7 +44,7 @@ params = {
     'text_temperature': 0.7,
     'waveform_temperature': 0.7,
 }
-sample_rate : SAMPLE_RATE
+
 
 input_hijack = {
     'state': False,
@@ -66,7 +66,7 @@ f0up_key = 0
 filter_radius = 3
 rms_mix_rate = 0.25
 protect = 0.33
-resample_sr = sample_rate
+resample_sr = SAMPLE_RATE
 f0method = os.environ.get("F0_METHOD", 'rmvpe').lower() #harvest or pm
 rvc_index_path = Path(os.environ.get('RVC_INDEX_PATH', 'extensions/bark_rvc_tts/Retrieval-based-Voice-Conversion-WebUI/logs/')) #Replace with your own
 
@@ -202,6 +202,8 @@ def setup():
         Path("extensions/bark_rvc_tts/generated").mkdir(parents=True)
     if not Path(model_path).exists():
         Path(model_path).mkdir(parents=True)
+    if not Path("extensions/bark_rvc_tts/generated_temp").exists():
+        Path("extensions/bark_rvc_tts/generated_temp").mkdir(parents=True)
     print("+ Done!")
 
     # load models into extension directory so we don't clutter the pc
