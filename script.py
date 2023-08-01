@@ -18,9 +18,6 @@ load_dotenv()
 model_path = Path(os.environ.get('BARK_MODEL_PATH', 'extensions/bark_rvc_tts/models/'))
 os.environ['XDG_CACHE_HOME'] = model_path.resolve().as_posix()
 
-
-
-
 import nltk
 import gradio as gr
 import numpy as np
@@ -236,7 +233,7 @@ def setup():
 
 
 def ui():
-    with gr.Accordion("Bark TTS"):
+    with gr.Accordion("Bark TTS + RVC"):
         with gr.Row():
             activate = gr.Checkbox(value=params['activate'], label='Activate TTS')
             autoplay = gr.Checkbox(value=params['autoplay'], label='Autoplay')
