@@ -1,5 +1,5 @@
-# text-generation-webui-barktts
-A simple extension for the [text-generation-webui by oobabooga](https://github.com/oobabooga/text-generation-webui) that uses [Bark](https://github.com/suno-ai/bark) for audio output.
+# text-generation-webui-barktts-plus-rvc (WIP)
+A simple extension for the [text-generation-webui by oobabooga](https://github.com/oobabooga/text-generation-webui) that uses [Bark](https://github.com/suno-ai/bark) and [Retrieval-based-Voice-Conversion Project](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebU) for audio output.
 
 ## How to install
 Assuming you already have the webui set up:
@@ -8,7 +8,7 @@ Assuming you already have the webui set up:
 2. Enter the  `text-generation-webui/extensions/` directory and clone this repository
 ```
 cd text-generation-webui/extensions/
-git clone https://github.com/minemo/text-generation-webui-barktts bark_tts/
+git clone https://github.com/Sergey004/text-generation-webui-barktts-plus-rvc bark_tts/
 ```
 3. install the requirements
 ```
