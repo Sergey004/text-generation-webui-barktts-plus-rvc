@@ -1,6 +1,7 @@
 """
 Bark TTS extension for https://github.com/oobabooga/text-generation-webui/
-All credit for the amazing tts model goes to https://github.com/suno-ai/bark 
+All credit for the amazing tts model goes to https://github.com/suno-ai/bark/
+All credit for the amazing RVC goes to https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI/
 """
 import hashlib
 from http.client import IncompleteRead
@@ -14,8 +15,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Should change this environment variable before import bark
-model_path = Path(os.environ.get('MODEL_PATH', 'extensions/bark_tts/models/'))
+model_path = Path(os.environ.get('BARK_MODEL_PATH', 'extensions/bark_rvc_tts/models/'))
 os.environ['XDG_CACHE_HOME'] = model_path.resolve().as_posix()
+
+
+
 
 import nltk
 import gradio as gr
@@ -23,6 +27,7 @@ import numpy as np
 from bark import SAMPLE_RATE, preload_models, generate_audio
 from bark.generation import ALLOWED_PROMPTS
 from modules import shared
+from extensions.bark_rvc_tts.rvc_infer import get_vc, vc_single
 from scipy.io.wavfile import write as write_wav
 
 nltk.download('punkt')
@@ -42,6 +47,7 @@ params = {
     'text_temperature': 0.7,
     'waveform_temperature': 0.7,
 }
+sample_rate : SAMPLE_RATE
 
 input_hijack = {
     'state': False,
@@ -52,6 +58,20 @@ streaming_state = shared.args.no_stream
 forced_modes = ["Man", "Woman", "Narrator"]
 modifier_options = ["[laughter]", "[laughs]", "[sighs]", "[music]", "[gasps]", "[clears throat]"]
 voice_presets = sorted(list(ALLOWED_PROMPTS))
+
+# RVC Section
+rvc_model_path = Path(os.environ.get('RVC_MODEL_PATH', 'extensions/bark_rvc_tts/Retrieval-based-Voice-Conversion-WebUI/weights/')) #Replace with your own
+device="cuda:0"
+is_half=True
+
+index_rate = 0.75
+f0up_key = 0
+filter_radius = 3
+rms_mix_rate = 0.25
+protect = 0.33
+resample_sr = sample_rate
+f0method = os.environ.get("F0_METHOD", 'rmvpe').lower() #harvest or pm
+rvc_index_path = Path(os.environ.get('RVC_INDEX_PATH', 'extensions/bark_rvc_tts/Retrieval-based-Voice-Conversion-WebUI/logs/')) #Replace with your own
 
 
 def manual_model_preload():
@@ -159,7 +179,12 @@ def output_modifier(string):
 
     audio = generate_long_audio(ttstext)
     time_label = int(time.time())
-    write_wav(f"extensions/bark_tts/generated/{shared.character}_{time_label}.wav", params['sample_rate'], audio)
+    write_wav(f"extensions/bark_rvc_tts/generated_temp/{shared.character}_{time_label}.wav", params['sample_rate'], audio)
+    output_file = Path(f"extensions/bark_rvc_tts/generated_temp/{shared.character}_{time_label}.wav")
+
+    wav_opt = vc_single(0,output_file,f0up_key,None,f0method,rvc_index_path,index_rate, filter_radius=filter_radius, resample_sr=params['sample_rate'], rms_mix_rate=rms_mix_rate, protect=protect)
+    write_wav(Path(f'extensions/bark_rvc_tts/generated/{shared.character}_{time_label}.wav'), resample_sr, wav_opt)
+
     autoplay = 'autoplay' if params['autoplay'] else ''
     if params['show_text']:
         string = f'<audio src="file/extensions/bark_tts/generated/{shared.character}_{time_label}.wav" controls {autoplay}></audio><br>{ttstext}'
@@ -176,8 +201,8 @@ def setup():
     print("+ This may take a while on first run don't worry!")
 
     print("+ Creating directories (if they don't exist)...")
-    if not Path("extensions/bark_tts/generated").exists():
-        Path("extensions/bark_tts/generated").mkdir(parents=True)
+    if not Path("extensions/bark_rvc_tts/generated").exists():
+        Path("extensions/bark_rvc_tts/generated").mkdir(parents=True)
     if not Path(model_path).exists():
         Path(model_path).mkdir(parents=True)
     print("+ Done!")
@@ -204,7 +229,7 @@ def setup():
     else:
         print("\t+ Forcing manual download...")
         manual_model_preload()
-
+    get_vc(rvc_model_path, device, is_half)
     print("+ Done!")
     toggle_activate(params['activate'])
     print("== Bark TTS extension loaded ==\n\n")
