@@ -8,7 +8,7 @@ Assuming you already have the webui set up:
 2. Enter the  `text-generation-webui/extensions/` directory and clone this repository
 ```
 cd text-generation-webui/extensions/
-git clone https://github.com/Sergey004/text-generation-webui-barktts-plus-rvc bark_tts/
+git clone https://github.com/Sergey004/text-generation-webui-barktts-plus-rvc bark_rvc_tts/
 ```
 3. install the requirements
 ```
