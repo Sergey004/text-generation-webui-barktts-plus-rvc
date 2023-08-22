@@ -41,6 +41,7 @@ params = {
     'force_manual_download': False,
     'voice': 'v2/en_speaker_3',
     'sample_rate': SAMPLE_RATE,
+    "resample_sr" : 48000,
     'text_temperature': 0.7,
     'waveform_temperature': 0.7,
 }
@@ -66,7 +67,7 @@ f0up_key = 0
 filter_radius = 3
 rms_mix_rate = 0.25
 protect = 0.33
-resample_sr = SAMPLE_RATE
+resample_sr = "48000"
 f0method = os.environ.get("F0_METHOD", 'rmvpe').lower() #harvest or pm
 rvc_index_path = Path(os.environ.get('RVC_INDEX_PATH', 'extensions/bark_rvc_tts/Retrieval-based-Voice-Conversion-WebUI/logs/')) #Replace with your own
 
@@ -179,7 +180,7 @@ def output_modifier(string):
     write_wav(f"extensions/bark_rvc_tts/generated_temp/{shared.character}_{time_label}.wav", params['sample_rate'], audio)
     output_file = Path(f"extensions/bark_rvc_tts/generated_temp/{shared.character}_{time_label}.wav")
 
-    wav_opt = vc_single(0,output_file,f0up_key,None,f0method,rvc_index_path,index_rate, filter_radius=filter_radius, resample_sr=params['sample_rate'], rms_mix_rate=rms_mix_rate, protect=protect)
+    wav_opt = vc_single(0,output_file,f0up_key,None,f0method,rvc_index_path,index_rate, filter_radius=filter_radius, resample_sr=params['resample_sr'], rms_mix_rate=rms_mix_rate, protect=protect)
     write_wav(Path(f'extensions/bark_rvc_tts/generated/{shared.character}_{time_label}.wav'), resample_sr, wav_opt)
 
     autoplay = 'autoplay' if params['autoplay'] else ''
